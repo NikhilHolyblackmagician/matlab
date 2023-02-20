@@ -1,0 +1,37 @@
+% Load the original image
+img = read(imds);
+
+% Convert the image to double precision
+img = im2double(img);
+
+% Reshape the image into a 2D matrix
+img_flat = reshape(img, [], size(img, 3));
+
+% Run k-means clustering with k=3
+k = 3;
+[idx, centroids] = kmeans(img_flat, k);
+
+% Reshape the index matrix into the original image size
+idx = reshape(idx, size(img, 1), size(img, 2));
+
+% Create a mask for each segment
+mask1 = (idx == 1);
+mask2 = (idx == 2);
+mask3 = (idx == 3);
+
+% Create a color image for each segment
+color1 = repmat(mask1, [1 1 3]) .* repmat(centroids(1,:), [size(img,1) size(img,2) 1]);
+color2 = repmat(mask2, [1 1 3]) .* repmat(centroids(2,:), [size(img,1) size(img,2) 1]);
+color3 = repmat(mask3, [1 1 3]) .* repmat(centroids(3,:), [size(img,1) size(img,2) 1]);
+
+% Combine the color images into a single segmented image
+segmented_img = color1 + color2 + color3;
+
+% Display the original image and the segmented image side by side
+figure;
+subplot(1,2,1);
+imshow(img);
+title('Original Image');
+subplot(1,2,2);
+imshow(segmented_img);
+title('Segmented Image');
